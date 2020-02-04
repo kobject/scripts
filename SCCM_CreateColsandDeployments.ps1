@@ -1,5 +1,6 @@
 ﻿$LimitingCollections = "All Users"
 $groups = import-csv FILEPATH 
+$dpgroupname = "DPGROUPNAME"
 
 
 #Create collection
@@ -34,7 +35,7 @@ foreach ($Group in $groups){
     }
     Else{
     Write-Host -Foregroundcolor Yellow "Distribute content to All Distribution Points.."
-    Start-CMContentDistribution -Applicationname $Group.name.Substring(2) -DistributionPointGroupName "All Distribution Points"
+    Start-CMContentDistribution -Applicationname $Group.name.Substring(2) -DistributionPointGroupName $dpgroupname
     Write-Host -Foregroundcolor Yellow "Create Application Deployment for $($Group.name)"
     New-CMApplicationDeployment -Collectionname $Group.name -Name $Group.name.Substring(2) -DeployAction Install -DeployPurpose Available -Usernotification DisplayAll -AvailableDateTime (get-date) -TimeBaseOn LocalTime
     }

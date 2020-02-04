@@ -1,7 +1,11 @@
-﻿$LimitingCollections = "All Users"
+﻿$smssitecode = "SMSSITECODE"
+$LimitingCollections = "All Users"
 $groups = import-csv FILEPATH 
 $dpgroupname = "DPGROUPNAME"
 
+#Import SCCM Module
+Import-Module $env:SMS_ADMIN_UI_PATH.Replace("\bin\i386", "\bin\configurationmanager.psd1")
+Set-Location "$($smssitecode):"
 
 #Create collection
 foreach ($Group in $groups){

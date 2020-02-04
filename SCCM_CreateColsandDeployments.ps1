@@ -2,7 +2,7 @@
 $groups = import-csv FILEPATH 
 
 
-#Maak groepen
+#Create collection
 foreach ($Group in $groups){
       if (Get-CMUserCollection -name $($Group.name)){
       Write-Host -Foregroundcolor Yellow "Usercollection $($Group.name) already exists..."        
@@ -19,7 +19,7 @@ foreach ($Group in $groups){
  
 }
 
-#Verplaatst de Collection naar folder
+#Move collection to folder
 foreach ($Group in $groups){
    Write-Host -ForegroundColor Yellow "Move collection $($Group.name) to MSI folder..."
    $destfolder = "<SMSSITECODE>:\UserCollection\Application\MSI"
@@ -27,7 +27,7 @@ foreach ($Group in $groups){
    Move-CMObject -InputObject $collid -FolderPath $destfolder    
 }
 
-#Maak Deployment
+#Create deployment
 foreach ($Group in $groups){
     if(Get-CMApplicationDeployment -name $Group.name.Substring(2)){
     Write-Host -Foregroundcolor Yellow "Deployment exists for $($Group.name.Substring(2))"

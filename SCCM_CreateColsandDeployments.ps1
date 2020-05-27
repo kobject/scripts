@@ -15,7 +15,6 @@ foreach ($adgroup in $groups){
     }
 }
 
-
 #Import SCCM Module
 Import-Module $env:SMS_ADMIN_UI_PATH.Replace("\bin\i386", "\bin\configurationmanager.psd1")
 

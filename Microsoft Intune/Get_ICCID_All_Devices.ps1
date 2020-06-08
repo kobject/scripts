@@ -27,7 +27,7 @@ function Get-AuthToken {
     
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         $User
     )
     
@@ -37,52 +37,52 @@ function Get-AuthToken {
     
     Write-Host "Checking for AzureAD module..."
     
-        $AadModule = Get-Module -Name "AzureAD" -ListAvailable
+    $AadModule = Get-Module -Name "AzureAD" -ListAvailable
     
-        if ($AadModule -eq $null) {
+    if ($AadModule -eq $null) {
     
-            Write-Host "AzureAD PowerShell module not found, looking for AzureADPreview"
-            $AadModule = Get-Module -Name "AzureADPreview" -ListAvailable
+        Write-Host "AzureAD PowerShell module not found, looking for AzureADPreview"
+        $AadModule = Get-Module -Name "AzureADPreview" -ListAvailable
     
-        }
+    }
     
-        if ($AadModule -eq $null) {
-            write-host
-            write-host "AzureAD Powershell module not installed..." -f Red
-            write-host "Install by running 'Install-Module AzureAD' or 'Install-Module AzureADPreview' from an elevated PowerShell prompt" -f Yellow
-            write-host "Script can't continue..." -f Red
-            write-host
-            exit
-        }
+    if ($AadModule -eq $null) {
+        write-host
+        write-host "AzureAD Powershell module not installed..." -f Red
+        write-host "Install by running 'Install-Module AzureAD' or 'Install-Module AzureADPreview' from an elevated PowerShell prompt" -f Yellow
+        write-host "Script can't continue..." -f Red
+        write-host
+        exit
+    }
     
     # Getting path to ActiveDirectory Assemblies
     # If the module count is greater than 1 find the latest version
     
-        if($AadModule.count -gt 1){
+    if ($AadModule.count -gt 1) {
     
-            $Latest_Version = ($AadModule | select version | Sort-Object)[-1]
+        $Latest_Version = ($AadModule | select version | Sort-Object)[-1]
     
-            $aadModule = $AadModule | ? { $_.version -eq $Latest_Version.version }
+        $aadModule = $AadModule | ? { $_.version -eq $Latest_Version.version }
     
-                # Checking if there are multiple versions of the same module found
+        # Checking if there are multiple versions of the same module found
     
-                if($AadModule.count -gt 1){
+        if ($AadModule.count -gt 1) {
     
-                $aadModule = $AadModule | select -Unique
-    
-                }
-    
-            $adal = Join-Path $AadModule.ModuleBase "Microsoft.IdentityModel.Clients.ActiveDirectory.dll"
-            $adalforms = Join-Path $AadModule.ModuleBase "Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll"
+            $aadModule = $AadModule | select -Unique
     
         }
     
-        else {
+        $adal = Join-Path $AadModule.ModuleBase "Microsoft.IdentityModel.Clients.ActiveDirectory.dll"
+        $adalforms = Join-Path $AadModule.ModuleBase "Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll"
     
-            $adal = Join-Path $AadModule.ModuleBase "Microsoft.IdentityModel.Clients.ActiveDirectory.dll"
-            $adalforms = Join-Path $AadModule.ModuleBase "Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll"
+    }
     
-        }
+    else {
+    
+        $adal = Join-Path $AadModule.ModuleBase "Microsoft.IdentityModel.Clients.ActiveDirectory.dll"
+        $adalforms = Join-Path $AadModule.ModuleBase "Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll"
+    
+    }
     
     [System.Reflection.Assembly]::LoadFrom($adal) | Out-Null
     
@@ -96,7 +96,7 @@ function Get-AuthToken {
     
     $authority = "https://login.microsoftonline.com/$Tenant"
     
-        try {
+    try {
     
         $authContext = New-Object "Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext" -ArgumentList $authority
     
@@ -107,49 +107,49 @@ function Get-AuthToken {
     
         $userId = New-Object "Microsoft.IdentityModel.Clients.ActiveDirectory.UserIdentifier" -ArgumentList ($User, "OptionalDisplayableId")
     
-        $authResult = $authContext.AcquireTokenAsync($resourceAppIdURI,$clientId,$redirectUri,$platformParameters,$userId).Result
+        $authResult = $authContext.AcquireTokenAsync($resourceAppIdURI, $clientId, $redirectUri, $platformParameters, $userId).Result
     
-            # If the accesstoken is valid then create the authentication header
+        # If the accesstoken is valid then create the authentication header
     
-            if($authResult.AccessToken){
+        if ($authResult.AccessToken) {
     
             # Creating header for Authorization token
     
             $authHeader = @{
-                'Content-Type'='application/json'
-                'Authorization'="Bearer " + $authResult.AccessToken
-                'ExpiresOn'=$authResult.ExpiresOn
-                }
+                'Content-Type'  = 'application/json'
+                'Authorization' = "Bearer " + $authResult.AccessToken
+                'ExpiresOn'     = $authResult.ExpiresOn
+            }
     
             return $authHeader
     
-            }
+        }
     
-            else {
+        else {
     
             Write-Host
             Write-Host "Authorization Access Token is null, please re-run authentication..." -ForegroundColor Red
             Write-Host
             break
     
-            }
-    
         }
     
-        catch {
+    }
+    
+    catch {
     
         write-host $_.Exception.Message -f Red
         write-host $_.Exception.ItemName -f Red
         write-host
         break
     
-        }
-    
     }
     
-    ####################################################
+}
     
-    Function Get-ManagedDevices(){
+####################################################
+    
+Function Get-ManagedDevices() {
     
     <#
     .SYNOPSIS
@@ -182,42 +182,42 @@ function Get-AuthToken {
     
         $Count_Params = 0
     
-        if($IncludeEAS.IsPresent){ $Count_Params++ }
-        if($ExcludeMDM.IsPresent){ $Count_Params++ }
+        if ($IncludeEAS.IsPresent) { $Count_Params++ }
+        if ($ExcludeMDM.IsPresent) { $Count_Params++ }
     
-            if($Count_Params -gt 1){
+        if ($Count_Params -gt 1) {
     
             write-warning "Multiple parameters set, specify a single parameter -IncludeEAS, -ExcludeMDM or no parameter against the function"
             Write-Host
             break
     
-            }
+        }
     
-            elseif($IncludeEAS){
+        elseif ($IncludeEAS) {
     
             $uri = "https://graph.microsoft.com/$graphApiVersion/$Resource"
     
-            }
+        }
     
-            elseif($ExcludeMDM){
+        elseif ($ExcludeMDM) {
     
             $uri = "https://graph.microsoft.com/$graphApiVersion/$Resource`?`$filter=managementAgent eq 'eas'"
     
-            }
+        }
     
-            else {
+        else {
     
             $uri = "https://graph.microsoft.com/$graphApiVersion/$Resource`?`$filter=managementAgent eq 'mdm' and managementAgent eq 'easmdm' and managementAgent eq 'googleCloudDevicePolicyController'"
             Write-Warning "EAS Devices are excluded by default, please use -IncludeEAS if you want to include those devices"
             Write-Host
     
-            }
-    
-            (Invoke-RestMethod -Uri $uri -Headers $authToken -Method Get).Value
-    
         }
     
-        catch {
+        (Invoke-RestMethod -Uri $uri -Headers $authToken -Method Get).Value
+    
+    }
+    
+    catch {
     
         $ex = $_.Exception
         $errorResponse = $ex.Response.GetResponseStream()
@@ -230,104 +230,104 @@ function Get-AuthToken {
         write-host
         break
     
+    }
+    
+}
+    
+####################################################
+    
+#region Authentication
+    
+write-host
+    
+# Checking if authToken exists before running authentication
+if ($global:authToken) {
+    
+    # Setting DateTime to Universal time to work in all timezones
+    $DateTime = (Get-Date).ToUniversalTime()
+    
+    # If the authToken exists checking when it expires
+    $TokenExpires = ($authToken.ExpiresOn.datetime - $DateTime).Minutes
+    
+    if ($TokenExpires -le 0) {
+    
+        write-host "Authentication Token expired" $TokenExpires "minutes ago" -ForegroundColor Yellow
+        write-host
+    
+        # Defining User Principal Name if not present
+    
+        if ($User -eq $null -or $User -eq "") {
+    
+            $User = Read-Host -Prompt "Please specify your user principal name for Azure Authentication"
+            Write-Host
+    
         }
     
+        $global:authToken = Get-AuthToken -User $User
+    
     }
+}
     
-    ####################################################
+# Authentication doesn't exist, calling Get-AuthToken function
     
-    #region Authentication
+else {
     
-    write-host
-    
-    # Checking if authToken exists before running authentication
-    if($global:authToken){
-    
-        # Setting DateTime to Universal time to work in all timezones
-        $DateTime = (Get-Date).ToUniversalTime()
-    
-        # If the authToken exists checking when it expires
-        $TokenExpires = ($authToken.ExpiresOn.datetime - $DateTime).Minutes
-    
-            if($TokenExpires -le 0){
-    
-            write-host "Authentication Token expired" $TokenExpires "minutes ago" -ForegroundColor Yellow
-            write-host
-    
-                # Defining User Principal Name if not present
-    
-                if($User -eq $null -or $User -eq ""){
-    
-                $User = Read-Host -Prompt "Please specify your user principal name for Azure Authentication"
-                Write-Host
-    
-                }
-    
-            $global:authToken = Get-AuthToken -User $User
-    
-            }
-    }
-    
-    # Authentication doesn't exist, calling Get-AuthToken function
-    
-    else {
-    
-        if($User -eq $null -or $User -eq ""){
+    if ($User -eq $null -or $User -eq "") {
     
         $User = Read-Host -Prompt "Please specify your user principal name for Azure Authentication"
         Write-Host
     
-        }
+    }
     
     # Getting the authorization token
     $global:authToken = Get-AuthToken -User $User
     
-    }
+}
     
-    #endregion
+#endregion
     
-    ####################################################
+####################################################
     
-    $ExportPath = Read-Host -Prompt "Please specify a path to export Managed Devices hardware data to e.g. C:\IntuneOutput"
+$ExportPath = Read-Host -Prompt "Please specify a path to export Managed Devices hardware data to e.g. C:\IntuneOutput"
     
-        # If the directory path doesn't exist prompt user to create the directory
+# If the directory path doesn't exist prompt user to create the directory
     
-        if(!(Test-Path "$ExportPath")){
-    
-        Write-Host
-        Write-Host "Path '$ExportPath' doesn't exist, do you want to create this directory? Y or N?" -ForegroundColor Yellow
-    
-        $Confirm = read-host
-    
-            if($Confirm -eq "y" -or $Confirm -eq "Y"){
-    
-            new-item -ItemType Directory -Path "$ExportPath" | Out-Null
-            Write-Host
-    
-            }
-    
-            else {
-    
-            Write-Host "Creation of directory path was cancelled..." -ForegroundColor Red
-            Write-Host
-            break
-    
-            }
-    
-        }
+if (!(Test-Path "$ExportPath")) {
     
     Write-Host
+    Write-Host "Path '$ExportPath' doesn't exist, do you want to create this directory? Y or N?" -ForegroundColor Yellow
     
-    ####################################################
+    $Confirm = read-host
     
-    $Devices = Get-ManagedDevices
-    $csv = Import-csv C:\tmp\tablets.csv
+    if ($Confirm -eq "y" -or $Confirm -eq "Y") {
     
-    if($Devices){
+        new-item -ItemType Directory -Path "$ExportPath" | Out-Null
+        Write-Host
     
-        $Results = @()
+    }
     
-        foreach($Device in $csv){
+    else {
+    
+        Write-Host "Creation of directory path was cancelled..." -ForegroundColor Red
+        Write-Host
+        break
+    
+    }
+    
+}
+    
+Write-Host
+    
+####################################################
+    
+$Devices = Get-ManagedDevices
+$csv = Import-csv C:\tmp\tablets.csv
+    
+if ($Devices) {
+    
+    $Results = @()
+    
+    foreach ($Device in $csv) {
     
         $DeviceID = $Device.deviceid
     
@@ -339,50 +339,50 @@ function Get-AuthToken {
         $DeviceInfo = (Invoke-RestMethod -Uri $uri -Headers $authToken -Method Get)
     
         
-        $DeviceNoHardware = $Device | Where-Object {$_.model -match ('SM-T*')} | select * -ExcludeProperty hardwareInformation,deviceActionResults,userId,imei,manufacturer,model,isSupervised,isEncrypted,serialNumber,meid,subscriberCarrier,iccid,udid,ethernetMacAddress 
+        $DeviceNoHardware = $Device | Where-Object { $_.model -match ('SM-T*') } | select * -ExcludeProperty hardwareInformation, deviceActionResults, userId, imei, manufacturer, model, isSupervised, isEncrypted, serialNumber, meid, subscriberCarrier, iccid, udid, ethernetMacAddress 
         #$DeviceNoHardware = $Device | select * -ExcludeProperty hardwareInformation,deviceActionResults,userId,imei,manufacturer,model,isSupervised,isEncrypted,serialNumber,meid,subscriberCarrier,iccid,udid,ethernetMacAddress
     
-        $HardwareExcludes = $DeviceInfo.hardwareInformation | select * -ExcludeProperty sharedDeviceCachedUsers,phoneNumber
-        $OtherDeviceInfo = $DeviceInfo | select iccid,udid,ethernetMacAddress
+        $HardwareExcludes = $DeviceInfo.hardwareInformation | select * -ExcludeProperty sharedDeviceCachedUsers, phoneNumber
+        $OtherDeviceInfo = $DeviceInfo | select iccid, udid, ethernetMacAddress
     
-            $Object = New-Object System.Object
+        $Object = New-Object System.Object
     
-                foreach($Property in $DeviceNoHardware.psobject.Properties){
+        foreach ($Property in $DeviceNoHardware.psobject.Properties) {
     
-                    $Object | Add-Member -MemberType NoteProperty -Name $Property.Name -Value $Property.Value
-    
-                }
-    
-                foreach($Property in $HardwareExcludes.psobject.Properties){
-    
-                    $Object | Add-Member -MemberType NoteProperty -Name $Property.Name -Value $Property.Value
-    
-                }
-    
-                foreach($Property in $OtherDeviceInfo.psobject.Properties){
-    
-                    $Object | Add-Member -MemberType NoteProperty -Name $Property.Name -Value $Property.Value
-    
-                }
-    
-            $Results += $Object
-    
-            $Object | Export-CSV c:\tmp\asad.csv -Append -NoTypeInformation
+            $Object | Add-Member -MemberType NoteProperty -Name $Property.Name -Value $Property.Value
     
         }
     
-        $Date = get-date
+        foreach ($Property in $HardwareExcludes.psobject.Properties) {
     
-        $Output = "ManagedDeviceHardwareInfo_" + $Date.Day + "-" + $Date.Month + "-" + $Date.Year + "_" + $Date.Hour + "-" + $Date.Minute
+            $Object | Add-Member -MemberType NoteProperty -Name $Property.Name -Value $Property.Value
     
-        $Results | Export-Csv "$ExportPath\$Output.csv" -NoTypeInformation
-        write-host "CSV created in $ExportPath\$Output.csv..." -f cyan
+        }
+    
+        foreach ($Property in $OtherDeviceInfo.psobject.Properties) {
+    
+            $Object | Add-Member -MemberType NoteProperty -Name $Property.Name -Value $Property.Value
+    
+        }
+    
+        $Results += $Object
+    
+        $Object | Export-CSV c:\tmp\asad.csv -Append -NoTypeInformation
     
     }
     
-    else {
+    $Date = get-date
+    
+    $Output = "ManagedDeviceHardwareInfo_" + $Date.Day + "-" + $Date.Month + "-" + $Date.Year + "_" + $Date.Hour + "-" + $Date.Minute
+    
+    $Results | Export-Csv "$ExportPath\$Output.csv" -NoTypeInformation
+    write-host "CSV created in $ExportPath\$Output.csv..." -f cyan
+    
+}
+    
+else {
     
     write-host "No Intune Managed Devices found..." -f green
     Write-Host
     
-    }
+}

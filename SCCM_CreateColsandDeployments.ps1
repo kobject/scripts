@@ -11,7 +11,7 @@ foreach ($adgroup in $groups) {
     if ($obj -eq $null) {
         Write-Host -Foregroundcolor Yellow "Creating security group in Active Directory..."   
         New-ADGroup –name “$($adgroup.name)” –groupscope Global –path $adcnpath
-        }
+    }
     else {
         Write-Host -Foregroundcolor Yellow "Group already exists"  
     }

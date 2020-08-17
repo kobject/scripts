@@ -87,7 +87,7 @@ If($Type -eq 'TaskScheduler'){
                 $Coll.RefreshSchedule = $scheduletoken
                 $Coll.RefreshType = 2
                 $Coll.put() | Out-Null
-                Write-Output "Successfully edited Collection $($Coll.Name)."
+                Write-Verbose "Successfully edited Collection $($Coll.Name)."
                 Write-Output "Successfully edited Collection $($Coll.Name)." | Out-File $LogPath -Append
             }
         catch

@@ -25,7 +25,6 @@ Import-Module $env:SMS_ADMIN_UI_PATH.Replace("\bin\i386", "\bin\configurationman
 
 Set-Location "$($smssitecode):"
 
-
 #Create collection
 foreach ($group in $groups){
       if (Get-CMUserCollection -name $($group.name)){
